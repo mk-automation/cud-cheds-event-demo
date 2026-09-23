@@ -1,13 +1,8 @@
-# CUD CHEDS Event Management – GitHub Pages Demo
+# CUD CHEDS QR Event Demo
+GitHub Pages prototype: create event → automatic event code → unique QR → QR attendance → duplicate-email prevention → automatic attendance count → post-event completion.
 
-Static demonstration version for management review. No PHP/MySQL server is required.
+## Publish
+Upload index.html, style.css and app.js to a GitHub repository. Go to Settings > Pages > Deploy from a branch > main > /(root).
 
-## Publish on GitHub Pages
-1. Create a new GitHub repository, for example `cud-cheds-event-demo`.
-2. Upload `index.html`, `style.css`, `app.js`, and this README to the repository root.
-3. Open **Settings → Pages**.
-4. Under **Build and deployment**, choose **Deploy from a branch**.
-5. Select **main** and **/(root)**, then Save.
-6. GitHub will provide the public demo URL after deployment.
-
-This prototype stores demo entries in browser localStorage. It is for demonstration only. The production version should use the PHP/MySQL backend and authentication.
+## Production
+This static demo stores records in the browser. Real CUD SSO, central MySQL/database storage, secure evidence uploads and automatic QR email require the server-hosted production version using Microsoft Entra ID and an approved CUD/Microsoft mail integration.
