@@ -1,27 +1,7 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CUD CHEDS Event Demo</title><link rel="stylesheet" href="style.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script></head><body>
 <header><div><b>CANADIAN UNIVERSITY DUBAI</b><small>CHEDS Event Management System</small></div><span>Interactive Demo</span></header>
-<nav><button onclick="schoolLoginPage()">School Login</button><button onclick="irpLoginPage()">IRP Department</button></nav><main>
-
-<section id="schoolLogin" class="hide">
- <div style="max-width:560px;margin:45px auto">
-  <div class="panel">
-   <div class="center"><h1>School Login</h1>
-   <p class="form-intro">Authorized School event coordinators.</p></div>
-   <form id="schoolLoginForm">
-    <label>School*
-     <select id="schoolUnit" required>
-      <option value="">Select School</option><option>CUD</option><option>SEAST</option><option>SAID</option><option>SOM</option><option>SCCI</option><option>SHSP</option></select>
-    </label>
-    <label>Username / Email*<input id="schoolUser" type="text" required placeholder="Enter username"></label>
-    <label>Password*<input id="schoolPass" type="password" required placeholder="Enter password"></label>
-    <div id="schoolLoginError" class="notice hide" style="margin:14px 0">Invalid school, username or password.</div>
-    <button class="primary" style="width:100%">Login</button>
-   </form>
-   <div class="field-help" style="margin-top:16px"><b>Demo:</b> select a unit and use its lowercase code + <b>@cud.ac.ae</b>. Password for all demo school accounts: <b>CUD123!</b><br>Example: SOM → som@cud.ac.ae</div>
-  </div>
- </div>
-</section>
-<section id="home"><div class="toplinks"><span class="status" id="unitBadge">School</span><button onclick="schoolLogout()">Logout</button></div><h1>School Event Portal</h1><p class="form-intro">Create events, generate/download attendance QR codes, and complete post-event information for your School.</p><div class="homecards">
+<nav><button onclick="home()">Event Organizer</button><button onclick="irpLoginPage()">IRP Department</button></nav><main>
+<section id="home"><h1>Event Organizer</h1><p class="form-intro">Use this shared link to create an event, generate/download its attendance QR, or return later to submit post-event information.</p><div class="homecards">
 <div class="homecard"><h2>1. Create New Event</h2><p>Complete the CHEDS Pre-Event Form. The system generates an Event ID and Attendance QR.</p><button class="primary" onclick="createPage()">Create Event</button></div>
 <div class="homecard"><h2>2. Find My Event</h2><p>Use Event ID and creator CUD email to retrieve your event and complete the post-event submission.</p><button class="primary" onclick="findPage()">Find Event</button></div>
 <div class="homecard"><h2>3. Attendance QR</h2><p>Participants scan the downloaded QR to open the attendance sheet. QR attendance is counted automatically.</p><button class="secondary" onclick="findPage()">Find Event / QR</button></div></div>
@@ -30,7 +10,7 @@
 <section id="create" class="hide"><h1>Academic Community Events - Pre QR</h1><p class="form-intro">Complete the event information. Event ID and Attendance QR are generated automatically after submission.</p>
 <form id="eventForm" class="panel grid">
 <label>Creator CUD Email*<span class="field-help">Used with Event ID to retrieve this event later.</span><input name="creator_email" type="email" required placeholder="name@cud.ac.ae"></label>
-<label>Department*<input name="department" required></label><label>School*<input name="school" id="eventSchool" readonly></label>
+<label>Department*<input name="department" required></label><label>School*<select name="school"><option>CUD</option><option>SEAST</option><option>SAID</option><option>SOM</option><option>SCCI</option><option>SHSP</option></select></label>
 <label>Event Name*<input name="event_name" required></label><label>Event Name Arabic*<input name="event_name_ar" required></label>
 <label class="wide">Event Description*<textarea name="event_description" maxlength="255" required></textarea></label><label class="wide">Event Description Arabic*<textarea name="event_description_ar" maxlength="255" required></textarea></label>
 <label>Event Main Category*<select name="main_category"><option>AE - Academic Event</option><option>CE - Community Event</option></select></label><label>Event SubCategory*<select name="sub_category"><option>AC-Academic</option><option>RI-Research and Innovation</option><option>CE-Community Engagement and Outreach</option><option>PD-Professional Development</option><option>IN-Industry and Career Connections</option><option>HW-Health and Wellness</option></select></label>
@@ -80,34 +60,9 @@ const EK="cud_v10_events",AK="cud_v10_att";let current=null;
 function seed(){if(localStorage.getItem(EK))return;localStorage.setItem(EK,JSON.stringify([{id:1,event_id:"CUD-EVT-2026-0001",creator_email:"demo@cud.ac.ae",department:"Computer Engineering",school:"SEAST",event_name:"AI Research Symposium",program_name:"BSc Computer Science",programs:"All Programs-SEAST",main_category:"AE - Academic Event",qr:12,manual:5,status:"Post-Event Submitted & Locked",evidence:["event-photo-1.jpg"],remarks:"Successful event."}]))}
 function es(){return JSON.parse(localStorage.getItem(EK)||"[]")}function save(a){localStorage.setItem(EK,JSON.stringify(a))}
 function sections(){return [...document.querySelectorAll("main>section")]}function show(id){sections().forEach(x=>x.classList.add("hide"));document.getElementById(id).classList.remove("hide");scrollTo(0,0)}
-function schoolLoginPage(){
- if(sessionStorage.getItem("cud_school_auth")==="1"){home();return;}
- show("schoolLogin");
-}
-function home(){
- if(sessionStorage.getItem("cud_school_auth")!=="1"){schoolLoginPage();return;}
- show("home");
- let unit=sessionStorage.getItem("cud_school_unit")||"";
- unitBadge.textContent=unit+" Event Coordinator";
- if(document.getElementById("eventSchool")) eventSchool.value=unit;
-}
-function schoolLogout(){
- sessionStorage.removeItem("cud_school_auth");
- sessionStorage.removeItem("cud_school_unit");
- sessionStorage.removeItem("cud_school_user");
- schoolLoginPage();
-}
-function createPage(){
- if(sessionStorage.getItem("cud_school_auth")!=="1"){schoolLoginPage();return;}
- show("create");
- eventSchool.value=sessionStorage.getItem("cud_school_unit")||"";
- let ce=document.querySelector('[name="creator_email"]');
- if(ce && !ce.value) ce.value=sessionStorage.getItem("cud_school_user")||"";
-}
-function findPage(){
- if(sessionStorage.getItem("cud_school_auth")!=="1"){schoolLoginPage();return;}
- show("find");found.innerHTML="";
-}
+function home(){show("home")}
+function createPage(){show("create")}
+function findPage(){show("find");found.innerHTML=""}
 function irpLoginPage(){
   if(sessionStorage.getItem("cud_irp_demo_auth")==="1"){irp();return;}
   show("irpLogin");document.getElementById("irpUser").focus();
@@ -175,22 +130,6 @@ function filtered(){let a=es(),s=fschool.value,d=fdept.value.toLowerCase(),p=fpr
 function renderIRP(){let a=filtered();ievents.textContent=a.length;iqr.textContent=a.reduce((s,e)=>s+(e.qr||0),0);imanual.textContent=a.reduce((s,e)=>s+(e.manual||0),0);itotal.textContent=a.reduce((s,e)=>s+(e.qr||0)+(e.manual||0),0);irows.innerHTML=a.map(e=>`<tr><td>${e.event_id}</td><td>${e.event_name}</td><td>${e.school}</td><td>${e.department}</td><td>${e.program_name||e.programs||""}</td><td>${e.qr||0}</td><td>${e.manual||0}</td><td><b>${(e.qr||0)+(e.manual||0)}</b></td><td>${e.status}</td><td><button onclick="editIRP(${e.id})">Edit</button></td></tr>`).join("")}
 function editIRP(id){let e=es().find(x=>x.id==id);irpEdit.innerHTML=`<div class="panel"><h2>IRP Edit / Correction</h2><div class="notice">Only IRP can modify a locked post-event record.</div><form id="ifm" class="grid"><label>Event Name<input id="ien" value="${e.event_name}"></label><label>Manual Attendance<input id="ima" type="number" min="0" value="${e.manual||0}"></label><label>Status<select id="ist"><option ${e.status==="Pre-Event Submitted"?"selected":""}>Pre-Event Submitted</option><option ${e.status==="Post-Event Submitted & Locked"?"selected":""}>Post-Event Submitted & Locked</option></select></label><label class="wide">Remarks<textarea id="irm">${e.remarks||""}</textarea></label><button class="primary wide">Save IRP Correction</button></form></div>`;document.getElementById("ifm").onsubmit=x=>{x.preventDefault();let a=es(),v=a.find(z=>z.id==id);v.event_name=ien.value;v.manual=+ima.value||0;v.status=ist.value;v.remarks=irm.value;save(a);renderIRP();irpEdit.innerHTML="";toast("IRP correction saved")}}
 function exportCSV(){let a=filtered(),cols=["event_id","event_name","school","department","program_name","main_category","qr","manual","status"],r=[cols.join(",")];a.forEach(e=>r.push(cols.map(k=>`"${String(e[k]??"").replaceAll('"','""')}"`).join(",")));let b=new Blob([r.join("\\n")],{type:"text/csv"}),u=URL.createObjectURL(b),x=document.createElement("a");x.href=u;x.download="CUD_CHEDS_Events.csv";x.click()}
-document.getElementById("schoolLoginForm").onsubmit=function(e){
- e.preventDefault();
- const unit=document.getElementById("schoolUnit").value;
- const user=document.getElementById("schoolUser").value.trim().toLowerCase();
- const pw=document.getElementById("schoolPass").value;
- const expected=unit.toLowerCase()+"@cud.ac.ae";
- if(unit && user===expected && pw==="CUD123!"){
-   sessionStorage.setItem("cud_school_auth","1");
-   sessionStorage.setItem("cud_school_unit",unit);
-   sessionStorage.setItem("cud_school_user",user);
-   document.getElementById("schoolLoginError").classList.add("hide");
-   home();
- }else{
-   document.getElementById("schoolLoginError").classList.remove("hide");
- }
-};
 document.getElementById("irpLoginForm").onsubmit=function(e){
  e.preventDefault();
  const u=document.getElementById("irpUser").value.trim().toLowerCase();
@@ -214,5 +153,5 @@ if(qp.get("attendance")){
   attId.textContent=local?.event_id||qcode;
   attForm.classList.remove("hide");
   attDone.classList.add("hide");
-}else schoolLoginPage();
+}else home();
 </script></body></html>
