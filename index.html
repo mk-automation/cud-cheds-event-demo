@@ -24,7 +24,7 @@
 <label>Ticket Price AED*<input name="ticket_price" type="number" min="0" value="0"></label><label>Event Budget AED*<input name="event_budget" type="number" min="0" value="0"></label><label>Open to Students*<select name="open_to_students"><option>Yes</option><option>No</option></select></label>
 <button class="primary wide">Submit Event & Generate QR</button></form><button class="secondary" onclick="home()">← Back</button></section>
 
-<section id="created" class="hide"><div class="panel center"><h1>Event Created Successfully</h1><div class="good"><b>Save your Event ID.</b> You will need the Event ID and creator CUD email to submit post-event information later.</div><h2 id="createdName"></h2><h1 style="color:#d71920" id="createdId"></h1><span class="status">Pre-Event Submitted</span><h2>Attendance QR</h2><p>This QR opens the participant Attendance Sheet directly.</p><div class="qrbox" id="qrbox"></div><div class="qr-actions"><button class="primary" onclick="downloadQRPDF()">Download Attendance QR PDF</button><button class="secondary" onclick="openAtt()">Open Attendance Sheet</button><button class="secondary" onclick="home()">Done</button></div></div></section>
+<section id="created" class="hide"><div class="panel center"><h1>Event Created Successfully</h1><div class="good"><b>Save your Event ID.</b> You will need the Event ID and creator CUD email to submit post-event information later.</div><h2 id="createdName"></h2><h1 style="color:#d71920" id="createdId"></h1><span class="status">Pre-Event Submitted</span><h2>Attendance QR</h2><p>This QR opens the participant Attendance Sheet directly.</p><div class="qrbox" id="qrbox"></div><p class="field-help">QR destination: <span id="qrDest"></span></p><div class="qr-actions"><button class="primary" onclick="downloadQRPDF()">Download Attendance QR PDF</button><button class="secondary" onclick="openAtt()">Open Attendance Sheet</button><button class="secondary" onclick="home()">Done</button></div></div></section>
 
 <section id="find" class="hide"><h1>Find My Event</h1><div class="panel"><div class="searchrow"><label>Event ID<input id="findId" placeholder="CUD-EVT-2026-0001"></label><label>Creator CUD Email<input id="findEmail" type="email" placeholder="name@cud.ac.ae"></label><button class="primary" onclick="findEvent()">Find Event</button></div><p class="field-help">Both values must match the information used when the event was created.</p></div><div id="found"></div><button class="secondary" onclick="home()">← Back</button></section>
 
@@ -40,12 +40,17 @@ function sections(){return [...document.querySelectorAll("main>section")]}functi
 function home(){show("home")}function createPage(){show("create")}function findPage(){show("find");found.innerHTML=""}function irp(){show("irp");renderIRP()}
 function toast(t){let x=document.getElementById("toast");x.textContent=t;x.style.display="block";setTimeout(()=>x.style.display="none",1800)}
 eventForm.onsubmit=e=>{e.preventDefault();let f=new FormData(eventForm),a=es(),obj={id:Date.now(),event_id:"CUD-EVT-2026-"+String(a.length+1).padStart(4,"0"),qr:0,manual:0,status:"Pre-Event Submitted",evidence:[],remarks:""};for(let[k,v]of f)obj[k]=v;obj.creator_email=obj.creator_email.toLowerCase();a.push(obj);save(a);current=obj.id;createdName.textContent=obj.event_name;createdId.textContent=obj.event_id;show("created");makeQR()}
-function makeQR(){qrbox.innerHTML="";let ev=es().find(x=>x.id==current);
-let u=new URL("attendance.html",location.href);
-u.searchParams.set("event",current);
-u.searchParams.set("code",ev?.event_id||"");
-u.searchParams.set("name",ev?.event_name||"");
-u=u.href;new QRCode(qrbox,{text:u,width:250,height:250})}
+function attendanceURL(){
+ let ev=es().find(x=>x.id==current);
+ let u=new URL(location.href);
+ u.hash="";
+ u.search="";
+ u.searchParams.set("attendance",current);
+ u.searchParams.set("code",ev?.event_id||"");
+ u.searchParams.set("name",ev?.event_name||"");
+ return u.href;
+}
+function makeQR(){qrbox.innerHTML="";let u=attendanceURL();document.getElementById("qrDest").textContent=u;new QRCode(qrbox,{text:u,width:250,height:250})}
 
 function downloadQRPDF(){
   let ev=es().find(x=>x.id==current);
@@ -82,17 +87,10 @@ function downloadQRPDF(){
   pdf.save(ev.event_id+"_Attendance_QR.pdf");
 }
 function downloadQR(){let img=qrbox.querySelector("img"),canvas=qrbox.querySelector("canvas"),u=img?.src||canvas?.toDataURL("image/png");if(!u)return;let a=document.createElement("a");a.href=u;a.download=(es().find(x=>x.id==current)?.event_id||"event")+"_Attendance_QR.png";a.click()}
-function openAtt(){
- let ev=es().find(x=>x.id==current);
- let u=new URL("attendance.html",location.href);
- u.searchParams.set("event",current);
- u.searchParams.set("code",ev?.event_id||"");
- u.searchParams.set("name",ev?.event_name||"");
- location.href=u.href;
-}
+function openAtt(){location.href=attendanceURL()}
 function loadAtt(id){let e=es().find(x=>x.id==id);if(!e)return;current=+id;show("attendance");attName.textContent=e.event_name;attId.textContent=e.event_id;attForm.classList.remove("hide");attDone.classList.add("hide")}
 function st(){let y=ptype.value==="CUD Student";sidw.style.display=y?"flex":"none";progw.style.display=y?"flex":"none";sid.required=y}ptype.onchange=st;st();
-attForm.onsubmit=e=>{e.preventDefault();let key=(sid.value||email.value||phone.value||(first.value+"|"+last.value)).trim().toLowerCase(),all=JSON.parse(localStorage.getItem(AK)||"{}"),l=all[current]||[];if(l.includes(key)){alert("Attendance already recorded for this participant.");return}l.push(key);all[current]=l;localStorage.setItem(AK,JSON.stringify(all));let a=es(),x=a.find(v=>v.id==current);x.qr=(x.qr||0)+1;save(a);attForm.classList.add("hide");attDone.classList.remove("hide")}
+attForm.onsubmit=e=>{e.preventDefault();let key=(sid.value||email.value||phone.value||(first.value+"|"+last.value)).trim().toLowerCase(),all=JSON.parse(localStorage.getItem(AK)||"{}"),l=all[current]||[];if(l.includes(key)){alert("Attendance already recorded for this participant.");return}l.push(key);all[current]=l;localStorage.setItem(AK,JSON.stringify(all));let a=es(),x=a.find(v=>v.id==current);if(x){x.qr=(x.qr||0)+1;save(a)}attForm.classList.add("hide");attDone.classList.remove("hide")}
 function findEvent(){let id=findId.value.trim().toUpperCase(),em=findEmail.value.trim().toLowerCase(),e=es().find(x=>x.event_id===id&&x.creator_email===em);if(!e){found.innerHTML='<div class="notice">Event not found. Check Event ID and creator CUD email.</div>';return}current=e.id;let locked=e.status==="Post-Event Submitted & Locked";found.innerHTML=`<div class="panel"><div class="actions"><h2 style="margin-right:auto">${e.event_name}</h2><span class="status ${locked?"locked":""}">${e.status}</span></div><div class="detailgrid"><div class="detail"><b>Event ID</b>${e.event_id}</div><div class="detail"><b>School</b>${e.school}</div><div class="detail"><b>Department</b>${e.department}</div><div class="detail"><b>Program</b>${e.program_name||e.programs||""}</div><div class="detail"><b>QR Attendance</b>${e.qr||0}</div><div class="detail"><b>Manual Attendance</b>${e.manual||0}</div><div class="detail"><b>Total Attendance</b>${(e.qr||0)+(e.manual||0)}</div></div><br><div class="actions"><button class="primary" onclick="eventQR(${e.id})">View / Download QR</button>${locked?'<button class="secondary" disabled>Post Event Already Submitted</button>':'<button class="primary" onclick="postForm('+e.id+')">Submit Post Event</button>'}</div>${locked?'<div class="notice" style="margin-top:15px"><b>Locked:</b> Post-event information has already been submitted. You can view this event but cannot modify or submit it again. Contact IRP if a correction is required.</div>':''}</div>`}
 function eventQR(id){current=id;let e=es().find(x=>x.id==id);createdName.textContent=e.event_name;createdId.textContent=e.event_id;show("created");makeQR()}
 function postForm(id){let e=es().find(x=>x.id==id);if(e.status==="Post-Event Submitted & Locked")return;found.innerHTML+=`<div class="panel"><h2>Post-Event Submission</h2><div class="eventbox">QR Attendance: <b>${e.qr||0}</b>. Enter only attendance not captured by QR.</div><form id="pf" class="grid"><label>Manual Attendance*<input id="mc" type="number" min="0" value="0" required></label><label>Evidence / Pictures*<input id="evf" type="file" multiple required accept="image/*,.pdf"></label><label class="wide">Remarks<textarea id="rem"></textarea></label><label class="wide"><input id="confirm" type="checkbox" required> I confirm the information is final. After submission I cannot edit or submit it again.</label><button class="primary wide">Final Submit & Lock</button></form></div>`;document.getElementById("pf").onsubmit=x=>{x.preventDefault();let a=es(),v=a.find(z=>z.id==id);v.manual=+mc.value||0;v.evidence=[...evf.files].map(f=>f.name);v.remarks=rem.value;v.status="Post-Event Submitted & Locked";save(a);findEvent();toast("Post-event submitted and locked")}}
@@ -100,5 +98,16 @@ function filtered(){let a=es(),s=fschool.value,d=fdept.value.toLowerCase(),p=fpr
 function renderIRP(){let a=filtered();ievents.textContent=a.length;iqr.textContent=a.reduce((s,e)=>s+(e.qr||0),0);imanual.textContent=a.reduce((s,e)=>s+(e.manual||0),0);itotal.textContent=a.reduce((s,e)=>s+(e.qr||0)+(e.manual||0),0);irows.innerHTML=a.map(e=>`<tr><td>${e.event_id}</td><td>${e.event_name}</td><td>${e.school}</td><td>${e.department}</td><td>${e.program_name||e.programs||""}</td><td>${e.qr||0}</td><td>${e.manual||0}</td><td><b>${(e.qr||0)+(e.manual||0)}</b></td><td>${e.status}</td><td><button onclick="editIRP(${e.id})">Edit</button></td></tr>`).join("")}
 function editIRP(id){let e=es().find(x=>x.id==id);irpEdit.innerHTML=`<div class="panel"><h2>IRP Edit / Correction</h2><div class="notice">Only IRP can modify a locked post-event record.</div><form id="ifm" class="grid"><label>Event Name<input id="ien" value="${e.event_name}"></label><label>Manual Attendance<input id="ima" type="number" min="0" value="${e.manual||0}"></label><label>Status<select id="ist"><option ${e.status==="Pre-Event Submitted"?"selected":""}>Pre-Event Submitted</option><option ${e.status==="Post-Event Submitted & Locked"?"selected":""}>Post-Event Submitted & Locked</option></select></label><label class="wide">Remarks<textarea id="irm">${e.remarks||""}</textarea></label><button class="primary wide">Save IRP Correction</button></form></div>`;document.getElementById("ifm").onsubmit=x=>{x.preventDefault();let a=es(),v=a.find(z=>z.id==id);v.event_name=ien.value;v.manual=+ima.value||0;v.status=ist.value;v.remarks=irm.value;save(a);renderIRP();irpEdit.innerHTML="";toast("IRP correction saved")}}
 function exportCSV(){let a=filtered(),cols=["event_id","event_name","school","department","program_name","main_category","qr","manual","status"],r=[cols.join(",")];a.forEach(e=>r.push(cols.map(k=>`"${String(e[k]??"").replaceAll('"','""')}"`).join(",")));let b=new Blob([r.join("\\n")],{type:"text/csv"}),u=URL.createObjectURL(b),x=document.createElement("a");x.href=u;x.download="CUD_CHEDS_Events.csv";x.click()}
-seed();let h=location.hash.match(/^#attendance-(\d+)/);if(h)loadAtt(h[1]);else home();
+seed();
+let qp=new URLSearchParams(location.search);
+if(qp.get("attendance")){
+  let qid=+qp.get("attendance"), qcode=qp.get("code")||"", qname=qp.get("name")||"Event Attendance";
+  let local=es().find(x=>x.id==qid);
+  current=qid;
+  show("attendance");
+  attName.textContent=local?.event_name||qname;
+  attId.textContent=local?.event_id||qcode;
+  attForm.classList.remove("hide");
+  attDone.classList.add("hide");
+}else home();
 </script></body></html>
