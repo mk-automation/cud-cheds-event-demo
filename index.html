@@ -1,0 +1,215 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CUD Event Attendance Demo</title><link rel="stylesheet" href="style.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><style>
+.field-help{font-weight:normal;color:#667085;font-size:12px;line-height:1.45;margin-top:-2px}
+.form-intro{color:#667085;line-height:1.55;margin-bottom:18px}
+.required-note{color:#c8102e;font-size:13px;margin-bottom:14px}
+</style></head>
+<body><header><div><b>CANADIAN UNIVERSITY DUBAI</b><small>CHEDS Event & Attendance Management</small></div><span>Demo Portal</span></header>
+<nav><button onclick="page('dash')">Dashboard</button><button onclick="page('new')">Create Event</button><button onclick="page('events');drawEvents()">Events</button></nav><div class="progressbar">
+<div class="step active"><span>1</span>Pre Event</div><div class="step"><span>2</span>Event Code &amp; QR</div>
+<div class="step"><span>3</span>Attendance</div><div class="step"><span>4</span>Post Event</div><div class="step"><span>5</span>Complete</div>
+</div><main>
+<section id="dash"><h1>Event Dashboard</h1><div class="cards"><div><b id="ne">0</b>Events</div><div><b id="mq">0</b>QR Attendance</div><div><b id="mm">0</b>Manual Attendance</div><div><b id="mt">0</b>Total Attendance</div></div><div class="panel"><b>Attendance rule:</b> Total Attendance = QR Attendance + Manual Attendance.</div></section>
+<section id="new" class="hide exact-page">
+<aside class="side">
+<h3>Event Details<br><small>(1 - 29)</small></h3>
+<div class="sideitem active">▣ <span>1</span> Basic Information</div>
+<div class="sideitem">♧ <span>2</span> Event Details</div>
+<div class="sideitem">▱ <span>3</span> Categories</div>
+<div class="sideitem">▤ <span>4</span> Program &amp; Audience</div>
+<div class="sideitem">▣ <span>5</span> Venue &amp; Date</div>
+<div class="sideitem">▤ <span>6</span> Additional Information</div>
+</aside>
+<div class="formarea">
+<div class="hero"><div class="heroicon">▣</div><div><h1>Academic Community Events - Pre QR</h1>
+<p class="form-intro">Number of conferences, symposiums, lecture series &amp; other academic events organized, co-hosted, or hosted by the institution and program with student participation.</p></div><div class="hero-brand">CANADIAN<br>UNIVERSITY DUBAI</div></div>
+<div class="alert">ⓘ &nbsp; Please complete all required fields (*). Guidance is provided under each field to help you fill the form correctly.</div><div class="section-title"><b>1</b> 1. BASIC INFORMATION</div>
+<form id="eventForm" class="panel grid">
+<label>1. Event Code<span class="field-help">IRP will assign the code automatically after submission.</span><input value="Automatically generated after submission" disabled></label>
+<label>2. Department*<span class="field-help">Enter the department that organized or hosted the event.</span><input name="department" required></label>
+<label>3. School*<span class="field-help">If the event is organized or hosted at University level, type “CUD”.</span><input name="school" required></label>
+<label>4. Event Name*<span class="field-help">Enter the official event name in English.</span><input name="name" required maxlength="255"></label>
+<label>5. Event Name Arabic*<span class="field-help">Enter the official event name in Arabic.</span><input name="name_ar" required maxlength="255"></label>
+<label class="wide">6. Event Description*<span class="field-help">Provide a brief description of the event. Text should not be more than 255 characters.</span><textarea name="description" maxlength="255" required></textarea></label>
+<label class="wide">7. Event Description Arabic*<span class="field-help">Provide the event description in Arabic. Text should not be more than 255 characters.</span><textarea name="description_ar" maxlength="255" required></textarea></label>
+<label class="wide">8. Website<span class="field-help">Provide a link to the event website, if available.</span><input name="website"></label>
+<label>9. Event Main Category*<span class="field-help">Select the main CHEDS category applicable to the event.</span><select name="category" required>
+<option value="">Select your answer</option>
+<option>AE - Academic Event</option>
+<option>CE - Community Event</option>
+</select></label>
+<label>10. Event SubCategory*<span class="field-help">Select the CHEDS subcategory that best describes the event.</span><select name="subcategory" required>
+<option value="">Select your answer</option>
+<option>AC-Academic</option>
+<option>RI-Research and Innovation</option>
+<option>CE-Community Engagement and Outreach</option>
+<option>PD-Professional Development</option>
+<option>IN-Industry and Career Connections</option>
+<option>HW-Health and Wellness</option>
+</select></label>
+<label>11. Event Type*<span class="field-help">Select the applicable event type.</span><select name="type" required>
+<option value="">Select your answer</option>
+<option>CN-Conference</option>
+<option>WS-Workshop</option>
+<option>CM-Competition</option>
+<option>SM-Seminar</option>
+<option>SYM-Symposium</option>
+<option>LC-Lecture Series</option>
+</select></label>
+<label>12. HEI's Role*<span class="field-help">Select the University’s role in the event, such as organizer, host, co-host or other applicable role.</span><select name="role" required>
+<option value="">Select your answer</option>
+<option>HS-Hosting an Event</option>
+<option>OE-Organizing an Event</option>
+<option>EP-Event Partner</option>
+<option>SP-Event Sponsor</option>
+</select></label>
+<label>13. Industry*<span class="field-help">Select the industrial or economic sector the event is targeting.</span><select name="industry" required>
+<option value="">Select your answer</option>
+<option>1-AGRICULTURE, FORESTRY AND FISHING</option>
+<option>2-MINING AND QUARRYING</option>
+<option>3-MANUFACTURING</option>
+<option>4-ELECTRICITY, GAS, STEAM AND AIR CONDITIONING SUPPLY</option>
+<option>5-WATER SUPPLY; SEWERAGE, WASTE MANAGEMENT AND REMEDIATION ACTIVITIES</option>
+</select></label>
+<label>14. Programs*<span class="field-help">Select the applicable option for School and CUD-level events.</span><select name="programs" required>
+<option value="">Select your answer</option>
+<option>All Programs-CUD</option>
+<option>All Programs-SEAST</option>
+<option>All Programs-SAID</option>
+<option>All Programs-SOM</option>
+<option>All Programs-SCCI</option>
+<option>All Programs-SHSP</option>
+<option>General Education</option>
+</select></label>
+<label>15. Program Name<span class="field-help">Enter the program name if the event is for a specific academic program.</span><input name="program_name"></label>
+<label>16. Venue*<span class="field-help">Enter the venue where the event is held.</span><input name="venue" required></label>
+<label>17. City*<span class="field-help">Enter the city where the event takes place.</span><input name="city" value="Dubai" required></label>
+<label>18. Country*<span class="field-help">Enter the country where the event takes place.</span><input name="country" value="United Arab Emirates" required></label>
+<label>19. Start Date*<span class="field-help">Select the event start date.</span><input type="date" name="date" required></label>
+<label>20. End Date*<span class="field-help">Select the event end date.</span><input type="date" name="end_date" required></label>
+<label>21. Event Duration*<span class="field-help">For a ONE DAY event, enter the duration of the event in number of hours.</span><input type="number" min="0" step="0.01" name="duration" required></label>
+<label>22. Frequency*<span class="field-help">Indicate whether the event is one-time or recurring.</span><select name="frequency"><option>One-time</option><option>Recurring</option></select></label>
+<label>23. Audience Type*<span class="field-help">Indicate whether the event audience is internal, external, or both.</span><select name="audience_type"><option>Internal Events</option><option>External Events</option><option>For Both</option></select></label>
+<label>24. Targeted Audience*<span class="field-help">Select or enter the primary audience targeted by the event.</span><select name="targeted_audience" required>
+<option value="">Select your answer</option>
+<option>ST-Students/ Prospective Students/ Alumni/ Parents &amp; Families of students and alumni</option>
+<option>FS-Faculty &amp; Staff</option>
+<option>CG-Community &amp; General Public</option>
+<option>RA-Researchers and Academics</option>
+<option>IN-Industry, Employers</option>
+<option>OD-Official delegates and diplomats</option>
+<option>MI-Mix audience with a combination of any of the above options</option>
+</select></label>
+<label>25. Scope*<span class="field-help">Select the geographical scope of the event.</span><select name="scope"><option>Local</option><option>Regional (MENA)</option><option>International</option></select></label>
+<label>26. Registration Required*<span class="field-help">Indicate whether participants are required to register for the event.</span><select name="registration"><option>Yes</option><option>No</option></select></label>
+<label>27. Ticket Price*<span class="field-help">Provide the average ticket price per person in AED. If no ticket is required for attendance, enter 0.</span><input type="number" min="0" step="0.01" name="ticket" value="0" required></label>
+<label>28. Event Budget (AED)*<span class="field-help">Enter the event budget in AED. If there is no budget allocated, enter 0.</span><input type="number" min="0" step="0.01" name="budget" value="0" required></label>
+<label>29. Open to Students*<span class="field-help">Indicate whether CUD students are permitted to attend the event.</span><select name="students"><option>Yes</option><option>No</option></select></label>
+<button class="primary wide">Submit Event &amp; Generate QR</button>
+</form></div></section>
+<section id="created" class="hide"><div class="panel center"><h1>Event Created</h1><h2 id="createdName"></h2><p>Event Code: <b id="createdCode"></b></p><div id="qr"></div><p>Participants scan this QR to record attendance.</p><button onclick="participant(current)" class="primary">Open Attendance Form</button></div></section>
+<section id="events" class="hide"><h1>Events</h1><div class="panel"><table><thead><tr><th>Code</th><th>Event</th><th>QR</th><th>Manual</th><th>Total</th><th>Action</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+<section id="participant" class="hide"><div class="panel"><h1 id="pTitle"></h1><p>Event Code: <b id="pCode"></b></p><form id="pForm" class="grid">
+<label class="wide">Are you CUD Student, Faculty, Staff or a Guest?*<select id="ptype" required><option>CUD Student</option><option>CUD Faculty</option><option>CUD Staff</option><option>Guest</option></select></label>
+<label>First Name*<input id="first" required></label><label>Last Name*<input id="last" required></label><label>Email (Optional)<input type="email" id="email"></label><label>Phone Number (Optional)<input id="phone"></label>
+<label id="sidWrap">Student ID*<input id="sid"></label><label id="progWrap">Program*<input id="program"></label><button class="primary wide">Submit Attendance</button></form><p id="pmsg"></p></div></section>
+<section id="post" class="hide"><div class="panel"><h1>Academic Community Events - Post Event</h1><div class="eventbox"><b id="postName"></b><br><span id="postCode"></span></div>
+<div class="summary"><div>QR Attendance<b id="qrCount">0</b></div><div>Manual Attendance<b id="manualNow">0</b></div><div>Total Attendance<b id="totalNow">0</b></div></div>
+<form id="postForm"><label>Number of Attendees (attendance not taken by QR code)*<input type="number" id="manualCount" min="0" required></label>
+<label>Upload Event Photograph / Evidence*<input type="file" id="photos" multiple accept="image/*,.pdf" required></label><label>Remarks<textarea id="remarks"></textarea></label>
+<button class="primary">Save Post-Event Information</button></form><p id="postmsg"></p></div></section>
+<section id="qrAttendance" class="hide">
+  <div class="formarea" style="max-width:900px;margin:auto">
+    <div class="hero">
+      <div class="heroicon">✓</div>
+      <div><h1 id="attEventName">Event Attendance</h1>
+      <p class="form-intro">Scan the event QR code and submit this form. Your submission will be counted automatically as QR Attendance.</p></div>
+      <div class="hero-brand">CANADIAN<br>UNIVERSITY DUBAI</div>
+    </div>
+    <div class="alert">ⓘ Please submit attendance only once for this event.</div>
+    <form id="qrAttendanceForm" class="panel grid">
+      <label class="wide">Are you a CUD Student, Faculty, Staff or Guest? *
+        <select id="attType" required><option value="">Select your answer</option><option>CUD Student</option><option>CUD Faculty</option><option>CUD Staff</option><option>Guest</option></select>
+      </label>
+      <label>First Name *<input id="attFirst" required></label>
+      <label>Last Name *<input id="attLast" required></label>
+      <label>Email<input id="attEmail" type="email"></label>
+      <label>Phone Number<input id="attPhone"></label>
+      <label id="attSidRow">Student ID *<input id="attSid"></label>
+      <label id="attProgramRow">Program<input id="attProgram"></label>
+      <button class="primary wide">Submit Attendance</button>
+    </form>
+    <div id="attThanks" class="panel hide center"><h2>✓ Attendance Recorded</h2><p>This submission has been added to <b>QR Attendance</b>.</p><button onclick="show('dash')">View Demo Dashboard</button></div>
+  </div>
+</section>
+
+
+<section id="qrpage" class="hide">
+ <div class="panel center" style="max-width:760px;margin:auto">
+  <h1>Event Code &amp; Attendance QR</h1>
+  <div class="eventbox"><b id="qrEventTitle">Demo Event</b><br><span id="qrEventCode">CUD-EVT-DEMO-0001</span></div>
+  <div id="demoQR" style="display:flex;justify-content:center;margin:25px"></div>
+  <p><b>This QR opens the Participant Attendance page.</b></p>
+  <button class="primary" onclick="show('qrAttendance')">Open Attendance Form (Demo)</button>
+ </div>
+</section>
+
+</main><script src="app.js"></script>
+<script>
+(function(){
+  const allSections=[...document.querySelectorAll("main > section")];
+  window.show=function(id){
+    allSections.forEach(x=>x.classList.add("hide"));
+    const el=document.getElementById(id); if(el) el.classList.remove("hide");
+    window.scrollTo({top:0,behavior:"smooth"});
+  };
+  let qrCount=Number(localStorage.getItem("cud_demo_qr_count")||0);
+  let manual=Number(localStorage.getItem("cud_demo_manual_count")||36);
+
+  function refreshCounts(){
+    document.querySelectorAll("[data-qr-count]").forEach(x=>x.textContent=qrCount);
+    document.querySelectorAll("[data-manual-count]").forEach(x=>x.textContent=manual);
+    document.querySelectorAll("[data-total-count]").forEach(x=>x.textContent=qrCount+manual);
+  }
+
+  const type=document.getElementById("attType"), sid=document.getElementById("attSid"),
+        sr=document.getElementById("attSidRow"), pr=document.getElementById("attProgramRow");
+  function toggleStudent(){
+    if(!type)return; const yes=type.value==="CUD Student";
+    sr.style.display=yes?"flex":"none"; pr.style.display=yes?"flex":"none"; sid.required=yes;
+  }
+  if(type){type.addEventListener("change",toggleStudent);toggleStudent();}
+
+  const af=document.getElementById("qrAttendanceForm");
+  if(af) af.addEventListener("submit",function(e){
+    e.preventDefault();
+    const key=(document.getElementById("attSid").value||document.getElementById("attEmail").value||
+      document.getElementById("attPhone").value||
+      (document.getElementById("attFirst").value+"|"+document.getElementById("attLast").value)).trim().toLowerCase();
+    const used=JSON.parse(localStorage.getItem("cud_demo_attendees")||"[]");
+    if(used.includes(key)){ alert("Attendance has already been recorded for this participant."); return; }
+    used.push(key); localStorage.setItem("cud_demo_attendees",JSON.stringify(used));
+    qrCount++; localStorage.setItem("cud_demo_qr_count",qrCount); refreshCounts();
+    af.classList.add("hide"); document.getElementById("attThanks").classList.remove("hide");
+  });
+
+  // Demo QR encodes a hash route that opens the attendance page in the GitHub Pages demo.
+  const qr=document.getElementById("demoQR");
+  if(qr && window.QRCode){
+    const attendanceURL=location.href.split("#")[0]+"#attendance";
+    new QRCode(qr,{text:attendanceURL,width:220,height:220});
+  }
+  if(location.hash==="#attendance") show("qrAttendance");
+
+  // After pre-event form submission, route to QR page in demo.
+  const ef=document.getElementById("eventForm");
+  if(ef) ef.addEventListener("submit",function(e){
+    e.preventDefault();
+    const name=(ef.querySelector('[name="name"]')||{}).value||"New Event";
+    const t=document.getElementById("qrEventTitle"); if(t)t.textContent=name;
+    show("qrpage");
+  },true);
+  refreshCounts();
+})();
+</script>
+</body></html>
