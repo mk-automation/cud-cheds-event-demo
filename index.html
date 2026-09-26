@@ -40,7 +40,12 @@ function sections(){return [...document.querySelectorAll("main>section")]}functi
 function home(){show("home")}function createPage(){show("create")}function findPage(){show("find");found.innerHTML=""}function irp(){show("irp");renderIRP()}
 function toast(t){let x=document.getElementById("toast");x.textContent=t;x.style.display="block";setTimeout(()=>x.style.display="none",1800)}
 eventForm.onsubmit=e=>{e.preventDefault();let f=new FormData(eventForm),a=es(),obj={id:Date.now(),event_id:"CUD-EVT-2026-"+String(a.length+1).padStart(4,"0"),qr:0,manual:0,status:"Pre-Event Submitted",evidence:[],remarks:""};for(let[k,v]of f)obj[k]=v;obj.creator_email=obj.creator_email.toLowerCase();a.push(obj);save(a);current=obj.id;createdName.textContent=obj.event_name;createdId.textContent=obj.event_id;show("created");makeQR()}
-function makeQR(){qrbox.innerHTML="";let u=new URL("index.html#attendance-"+current,location.href).href;new QRCode(qrbox,{text:u,width:250,height:250})}
+function makeQR(){qrbox.innerHTML="";let ev=es().find(x=>x.id==current);
+let u=new URL("attendance.html",location.href);
+u.searchParams.set("event",current);
+u.searchParams.set("code",ev?.event_id||"");
+u.searchParams.set("name",ev?.event_name||"");
+u=u.href;new QRCode(qrbox,{text:u,width:250,height:250})}
 
 function downloadQRPDF(){
   let ev=es().find(x=>x.id==current);
@@ -77,7 +82,14 @@ function downloadQRPDF(){
   pdf.save(ev.event_id+"_Attendance_QR.pdf");
 }
 function downloadQR(){let img=qrbox.querySelector("img"),canvas=qrbox.querySelector("canvas"),u=img?.src||canvas?.toDataURL("image/png");if(!u)return;let a=document.createElement("a");a.href=u;a.download=(es().find(x=>x.id==current)?.event_id||"event")+"_Attendance_QR.png";a.click()}
-function openAtt(){location.hash="attendance-"+current;loadAtt(current)}
+function openAtt(){
+ let ev=es().find(x=>x.id==current);
+ let u=new URL("attendance.html",location.href);
+ u.searchParams.set("event",current);
+ u.searchParams.set("code",ev?.event_id||"");
+ u.searchParams.set("name",ev?.event_name||"");
+ location.href=u.href;
+}
 function loadAtt(id){let e=es().find(x=>x.id==id);if(!e)return;current=+id;show("attendance");attName.textContent=e.event_name;attId.textContent=e.event_id;attForm.classList.remove("hide");attDone.classList.add("hide")}
 function st(){let y=ptype.value==="CUD Student";sidw.style.display=y?"flex":"none";progw.style.display=y?"flex":"none";sid.required=y}ptype.onchange=st;st();
 attForm.onsubmit=e=>{e.preventDefault();let key=(sid.value||email.value||phone.value||(first.value+"|"+last.value)).trim().toLowerCase(),all=JSON.parse(localStorage.getItem(AK)||"{}"),l=all[current]||[];if(l.includes(key)){alert("Attendance already recorded for this participant.");return}l.push(key);all[current]=l;localStorage.setItem(AK,JSON.stringify(all));let a=es(),x=a.find(v=>v.id==current);x.qr=(x.qr||0)+1;save(a);attForm.classList.add("hide");attDone.classList.remove("hide")}
