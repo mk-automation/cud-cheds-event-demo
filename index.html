@@ -1,8 +1,8 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CUD CHEDS Event Demo</title><link rel="stylesheet" href="style.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script></head><body>
-<header><div><b>CANADIAN UNIVERSITY DUBAI</b><small>Event Management System</small></div><span>Interactive Demo</span></header>
-<nav><button onclick="home()">Event Organizer</button><!--<button onclick="irp()">IRP Department</button>--></nav><main>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CUD CHEDS Event Demo</title><link rel="stylesheet" href="style.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script></head><body>
+<header><div><b>CANADIAN UNIVERSITY DUBAI</b><small>CHEDS Event Management System</small></div><span>Interactive Demo</span></header>
+<nav><button onclick="home()">Event Organizer</button><button onclick="irp()">IRP Department</button></nav><main>
 <section id="home"><h1>Event Organizer</h1><p class="form-intro">Use this shared link to create an event, generate/download its attendance QR, or return later to submit post-event information.</p><div class="homecards">
-<div class="homecard"><h2>1. Create New Event</h2><p>Complete the Pre-Event Form. The system generates an Event ID and Attendance QR.</p><button class="primary" onclick="createPage()">Create Event</button></div>
+<div class="homecard"><h2>1. Create New Event</h2><p>Complete the CHEDS Pre-Event Form. The system generates an Event ID and Attendance QR.</p><button class="primary" onclick="createPage()">Create Event</button></div>
 <div class="homecard"><h2>2. Find My Event</h2><p>Use Event ID and creator CUD email to retrieve your event and complete the post-event submission.</p><button class="primary" onclick="findPage()">Find Event</button></div>
 <div class="homecard"><h2>3. Attendance QR</h2><p>Participants scan the downloaded QR to open the attendance sheet. QR attendance is counted automatically.</p><button class="secondary" onclick="findPage()">Find Event / QR</button></div></div>
 <div class="notice"><b>Post-event lock:</b> After the organizer submits Manual Attendance and Evidence, the record is locked. The organizer can view it but cannot modify or submit it again. Only IRP can edit/unlock it.</div></section>
@@ -24,7 +24,7 @@
 <label>Ticket Price AED*<input name="ticket_price" type="number" min="0" value="0"></label><label>Event Budget AED*<input name="event_budget" type="number" min="0" value="0"></label><label>Open to Students*<select name="open_to_students"><option>Yes</option><option>No</option></select></label>
 <button class="primary wide">Submit Event & Generate QR</button></form><button class="secondary" onclick="home()">← Back</button></section>
 
-<section id="created" class="hide"><div class="panel center"><h1>Event Created Successfully</h1><div class="good"><b>Save your Event ID.</b> You will need the Event ID and creator CUD email to submit post-event information later.</div><h2 id="createdName"></h2><h1 style="color:#d71920" id="createdId"></h1><span class="status">Pre-Event Submitted</span><h2>Attendance QR</h2><p>This QR opens the participant Attendance Sheet directly.</p><div class="qrbox" id="qrbox"></div><div class="qr-actions"><button class="primary" onclick="downloadQR()">Download QR</button><button class="secondary" onclick="openAtt()">Open Attendance Sheet</button><button class="secondary" onclick="home()">Done</button></div></div></section>
+<section id="created" class="hide"><div class="panel center"><h1>Event Created Successfully</h1><div class="good"><b>Save your Event ID.</b> You will need the Event ID and creator CUD email to submit post-event information later.</div><h2 id="createdName"></h2><h1 style="color:#d71920" id="createdId"></h1><span class="status">Pre-Event Submitted</span><h2>Attendance QR</h2><p>This QR opens the participant Attendance Sheet directly.</p><div class="qrbox" id="qrbox"></div><div class="qr-actions"><button class="primary" onclick="downloadQRPDF()">Download Attendance QR PDF</button><button class="secondary" onclick="openAtt()">Open Attendance Sheet</button><button class="secondary" onclick="home()">Done</button></div></div></section>
 
 <section id="find" class="hide"><h1>Find My Event</h1><div class="panel"><div class="searchrow"><label>Event ID<input id="findId" placeholder="CUD-EVT-2026-0001"></label><label>Creator CUD Email<input id="findEmail" type="email" placeholder="name@cud.ac.ae"></label><button class="primary" onclick="findEvent()">Find Event</button></div><p class="field-help">Both values must match the information used when the event was created.</p></div><div id="found"></div><button class="secondary" onclick="home()">← Back</button></section>
 
@@ -41,6 +41,41 @@ function home(){show("home")}function createPage(){show("create")}function findP
 function toast(t){let x=document.getElementById("toast");x.textContent=t;x.style.display="block";setTimeout(()=>x.style.display="none",1800)}
 eventForm.onsubmit=e=>{e.preventDefault();let f=new FormData(eventForm),a=es(),obj={id:Date.now(),event_id:"CUD-EVT-2026-"+String(a.length+1).padStart(4,"0"),qr:0,manual:0,status:"Pre-Event Submitted",evidence:[],remarks:""};for(let[k,v]of f)obj[k]=v;obj.creator_email=obj.creator_email.toLowerCase();a.push(obj);save(a);current=obj.id;createdName.textContent=obj.event_name;createdId.textContent=obj.event_id;show("created");makeQR()}
 function makeQR(){qrbox.innerHTML="";let u=new URL("index.html#attendance-"+current,location.href).href;new QRCode(qrbox,{text:u,width:250,height:250})}
+
+function downloadQRPDF(){
+  let ev=es().find(x=>x.id==current);
+  if(!ev){alert("Event not found.");return;}
+  let img=qrbox.querySelector("img"), canvas=qrbox.querySelector("canvas");
+  let qrData=img?.src || canvas?.toDataURL("image/png");
+  if(!qrData){alert("QR is not ready yet.");return;}
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
+  const pageW=210;
+  pdf.setTextColor(15,35,65);
+  pdf.setFont("helvetica","bold");
+  pdf.setFontSize(19);
+  pdf.text(String(ev.event_name||"EVENT").toUpperCase(),pageW/2,22,{align:"center"});
+  pdf.setTextColor(215,25,32);
+  pdf.setFontSize(27);
+  pdf.text(ev.event_id,pageW/2,42,{align:"center"});
+  pdf.setFillColor(255,237,240);
+  pdf.roundedRect(76,49,58,10,5,5,"F");
+  pdf.setFontSize(10);
+  pdf.text("Pre-Event Submitted",pageW/2,55.5,{align:"center"});
+  pdf.setTextColor(15,35,65);
+  pdf.setFontSize(21);
+  pdf.text("Attendance QR",pageW/2,72,{align:"center"});
+  pdf.setFont("helvetica","normal");
+  pdf.setFontSize(12);
+  pdf.text("Scan this QR to open the participant Attendance Sheet directly.",pageW/2,87,{align:"center"});
+  pdf.addImage(qrData,"PNG",55,100,100,100);
+  pdf.setDrawColor(220,225,232);
+  pdf.line(30,211,180,211);
+  pdf.setFontSize(9);
+  pdf.setTextColor(90,100,115);
+  pdf.text("Canadian University Dubai - CHEDS Event Attendance",pageW/2,220,{align:"center"});
+  pdf.save(ev.event_id+"_Attendance_QR.pdf");
+}
 function downloadQR(){let img=qrbox.querySelector("img"),canvas=qrbox.querySelector("canvas"),u=img?.src||canvas?.toDataURL("image/png");if(!u)return;let a=document.createElement("a");a.href=u;a.download=(es().find(x=>x.id==current)?.event_id||"event")+"_Attendance_QR.png";a.click()}
 function openAtt(){location.hash="attendance-"+current;loadAtt(current)}
 function loadAtt(id){let e=es().find(x=>x.id==id);if(!e)return;current=+id;show("attendance");attName.textContent=e.event_name;attId.textContent=e.event_id;attForm.classList.remove("hide");attDone.classList.add("hide")}
