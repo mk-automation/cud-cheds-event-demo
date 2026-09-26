@@ -1,15 +1,12 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>CUD Event Attendance Demo</title><link rel="stylesheet" href="style.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><style>
-.field-help{font-weight:normal;color:#667085;font-size:12px;line-height:1.45;margin-top:-2px}
-.form-intro{color:#667085;line-height:1.55;margin-bottom:18px}
-.required-note{color:#c8102e;font-size:13px;margin-bottom:14px}
-</style></head>
+<title>CUD Event Attendance Demo</title><link rel="stylesheet" href="style.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script></head>
 <body><header><div><b>CANADIAN UNIVERSITY DUBAI</b><small>CHEDS Event & Attendance Management</small></div><span>Demo Portal</span></header>
 <nav><button onclick="page('dash')">Dashboard</button><button onclick="page('new')">Create Event</button><button onclick="page('events');drawEvents()">Events</button></nav><main>
 <section id="dash"><h1>Event Dashboard</h1><div class="cards"><div><b id="ne">0</b>Events</div><div><b id="mq">0</b>QR Attendance</div><div><b id="mm">0</b>Manual Attendance</div><div><b id="mt">0</b>Total Attendance</div></div><div class="panel"><b>Attendance rule:</b> Total Attendance = QR Attendance + Manual Attendance.</div></section>
 <section id="new" class="hide"><h1>Academic Community Events - Pre QR</h1>
 <p class="form-intro">Number of conferences, symposiums, lecture series &amp; other academic events organized, co-hosted, or hosted by the institution and program with student participation.</p>
 <p class="required-note">* Required</p>
+<div class="eventbox"><b>Event workflow:</b> Complete the pre-event information → system generates the Event Code &amp; QR → participants record attendance → organizer completes the post-event information and evidence.</div>
 <form id="eventForm" class="panel grid">
 <label>1. Event Code<span class="field-help">IRP will assign the code automatically after submission.</span><input value="Automatically generated after submission" disabled></label>
 <label>2. Department*<span class="field-help">Enter the department that organized or hosted the event.</span><input name="department" required></label>
