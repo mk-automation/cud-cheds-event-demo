@@ -19,12 +19,54 @@
 <label class="wide">6. Event Description*<span class="field-help">Provide a brief description of the event. Text should not be more than 255 characters.</span><textarea name="description" maxlength="255" required></textarea></label>
 <label class="wide">7. Event Description Arabic*<span class="field-help">Provide the event description in Arabic. Text should not be more than 255 characters.</span><textarea name="description_ar" maxlength="255" required></textarea></label>
 <label class="wide">8. Website<span class="field-help">Provide a link to the event website, if available.</span><input name="website"></label>
-<label>9. Event Main Category*<span class="field-help">Select the main CHEDS category applicable to the event.</span><input name="category" required></label>
-<label>10. Event SubCategory*<span class="field-help">Select the CHEDS subcategory that best describes the event.</span><input name="subcategory" required></label>
-<label>11. Event Type*<span class="field-help">Select the applicable event type.</span><input name="type" required></label>
-<label>12. HEI's Role*<span class="field-help">Select the University’s role in the event, such as organizer, host, co-host or other applicable role.</span><input name="role" required></label>
-<label>13. Industry*<span class="field-help">Select the industrial or economic sector the event is targeting.</span><input name="industry" required></label>
-<label>14. Programs*<span class="field-help">Select the applicable option for School and CUD-level events.</span><input name="programs" required></label>
+<label>9. Event Main Category*<span class="field-help">Select the main CHEDS category applicable to the event.</span><select name="category" required>
+<option value="">Select your answer</option>
+<option>AE - Academic Event</option>
+<option>CE - Community Event</option>
+</select></label>
+<label>10. Event SubCategory*<span class="field-help">Select the CHEDS subcategory that best describes the event.</span><select name="subcategory" required>
+<option value="">Select your answer</option>
+<option>AC-Academic</option>
+<option>RI-Research and Innovation</option>
+<option>CE-Community Engagement and Outreach</option>
+<option>PD-Professional Development</option>
+<option>IN-Industry and Career Connections</option>
+<option>HW-Health and Wellness</option>
+</select></label>
+<label>11. Event Type*<span class="field-help">Select the applicable event type.</span><select name="type" required>
+<option value="">Select your answer</option>
+<option>CN-Conference</option>
+<option>WS-Workshop</option>
+<option>CM-Competition</option>
+<option>SM-Seminar</option>
+<option>SYM-Symposium</option>
+<option>LC-Lecture Series</option>
+</select></label>
+<label>12. HEI's Role*<span class="field-help">Select the University’s role in the event, such as organizer, host, co-host or other applicable role.</span><select name="role" required>
+<option value="">Select your answer</option>
+<option>HS-Hosting an Event</option>
+<option>OE-Organizing an Event</option>
+<option>EP-Event Partner</option>
+<option>SP-Event Sponsor</option>
+</select></label>
+<label>13. Industry*<span class="field-help">Select the industrial or economic sector the event is targeting.</span><select name="industry" required>
+<option value="">Select your answer</option>
+<option>1-AGRICULTURE, FORESTRY AND FISHING</option>
+<option>2-MINING AND QUARRYING</option>
+<option>3-MANUFACTURING</option>
+<option>4-ELECTRICITY, GAS, STEAM AND AIR CONDITIONING SUPPLY</option>
+<option>5-WATER SUPPLY; SEWERAGE, WASTE MANAGEMENT AND REMEDIATION ACTIVITIES</option>
+</select></label>
+<label>14. Programs*<span class="field-help">Select the applicable option for School and CUD-level events.</span><select name="programs" required>
+<option value="">Select your answer</option>
+<option>All Programs-CUD</option>
+<option>All Programs-SEAST</option>
+<option>All Programs-SAID</option>
+<option>All Programs-SOM</option>
+<option>All Programs-SCCI</option>
+<option>All Programs-SHSP</option>
+<option>General Education</option>
+</select></label>
 <label>15. Program Name<span class="field-help">Enter the program name if the event is for a specific academic program.</span><input name="program_name"></label>
 <label>16. Venue*<span class="field-help">Enter the venue where the event is held.</span><input name="venue" required></label>
 <label>17. City*<span class="field-help">Enter the city where the event takes place.</span><input name="city" value="Dubai" required></label>
@@ -34,7 +76,16 @@
 <label>21. Event Duration*<span class="field-help">For a ONE DAY event, enter the duration of the event in number of hours.</span><input type="number" min="0" step="0.01" name="duration" required></label>
 <label>22. Frequency*<span class="field-help">Indicate whether the event is one-time or recurring.</span><select name="frequency"><option>One-time</option><option>Recurring</option></select></label>
 <label>23. Audience Type*<span class="field-help">Indicate whether the event audience is internal, external, or both.</span><select name="audience_type"><option>Internal Events</option><option>External Events</option><option>For Both</option></select></label>
-<label>24. Targeted Audience*<span class="field-help">Select or enter the primary audience targeted by the event.</span><input name="targeted_audience" required></label>
+<label>24. Targeted Audience*<span class="field-help">Select or enter the primary audience targeted by the event.</span><select name="targeted_audience" required>
+<option value="">Select your answer</option>
+<option>ST-Students/ Prospective Students/ Alumni/ Parents &amp; Families of students and alumni</option>
+<option>FS-Faculty &amp; Staff</option>
+<option>CG-Community &amp; General Public</option>
+<option>RA-Researchers and Academics</option>
+<option>IN-Industry, Employers</option>
+<option>OD-Official delegates and diplomats</option>
+<option>MI-Mix audience with a combination of any of the above options</option>
+</select></label>
 <label>25. Scope*<span class="field-help">Select the geographical scope of the event.</span><select name="scope"><option>Local</option><option>Regional (MENA)</option><option>International</option></select></label>
 <label>26. Registration Required*<span class="field-help">Indicate whether participants are required to register for the event.</span><select name="registration"><option>Yes</option><option>No</option></select></label>
 <label>27. Ticket Price*<span class="field-help">Provide the average ticket price per person in AED. If no ticket is required for attendance, enter 0.</span><input type="number" min="0" step="0.01" name="ticket" value="0" required></label>
