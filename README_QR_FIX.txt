@@ -1,0 +1,1 @@
+QR now points to attendance.html?event=EVENT_ID. Publish to GitHub Pages before scanning from a phone. Static localStorage is device-specific; the XAMPP/MySQL version is required for true cross-device shared attendance counting.
