@@ -1,6 +1,6 @@
 <!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CUD CHEDS Event Demo</title><link rel="stylesheet" href="style.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script></head><body>
 <header><div><b>CANADIAN UNIVERSITY DUBAI</b><small>CHEDS Event Management System</small></div><span>Interactive Demo</span></header>
-<nav><button onclick="home()">Event Organizer</button><button onclick="irp()">IRP Department</button></nav><main>
+<nav><button onclick="home()">Event Organizer</button><button onclick="irpLoginPage()">IRP Department</button></nav><main>
 <section id="home"><h1>Event Organizer</h1><p class="form-intro">Use this shared link to create an event, generate/download its attendance QR, or return later to submit post-event information.</p><div class="homecards">
 <div class="homecard"><h2>1. Create New Event</h2><p>Complete the CHEDS Pre-Event Form. The system generates an Event ID and Attendance QR.</p><button class="primary" onclick="createPage()">Create Event</button></div>
 <div class="homecard"><h2>2. Find My Event</h2><p>Use Event ID and creator CUD email to retrieve your event and complete the post-event submission.</p><button class="primary" onclick="findPage()">Find Event</button></div>
@@ -30,14 +30,46 @@
 
 <section id="attendance" class="hide"><h1>Participant Attendance Sheet</h1><div class="panel"><div class="eventbox"><b id="attName"></b><br><span id="attId"></span></div><form id="attForm" class="grid"><label class="wide">Participant Type*<select id="ptype" required><option value="">Select</option><option>CUD Student</option><option>CUD Faculty</option><option>CUD Staff</option><option>Guest</option></select></label><label>First Name*<input id="first" required></label><label>Last Name*<input id="last" required></label><label>Email<input id="email"></label><label>Phone<input id="phone"></label><label id="sidw">Student ID*<input id="sid"></label><label id="progw">Program<input id="pprogram"></label><button class="primary wide">Submit Attendance</button></form><div id="attDone" class="success center hide"><h2>✓ Attendance Recorded</h2><p>Counted under QR Attendance.</p></div></div></section>
 
-<section id="irp" class="hide"><div class="toplinks"><button class="active">IRP Dashboard</button><button onclick="exportCSV()">Export CSV</button></div><h1>IRP Department Portal</h1><div class="irpgrid"><div class="irpbox"><strong id="ievents">0</strong>Total Events</div><div class="irpbox"><strong id="iqr">0</strong>QR Attendance</div><div class="irpbox"><strong id="imanual">0</strong>Manual Attendance</div><div class="irpbox"><strong id="itotal">0</strong>Total Attendance</div></div><div class="panel filtergrid"><select id="fschool"><option value="">All Schools</option><option>CUD</option><option>SEAST</option><option>SAID</option><option>SOM</option><option>SCCI</option><option>SHSP</option></select><input id="fdept" placeholder="Department"><input id="fprogram" placeholder="Program"><select id="fstatus"><option value="">All Statuses</option><option>Pre-Event Submitted</option><option>Post-Event Submitted & Locked</option></select><button class="primary" onclick="renderIRP()">Apply</button></div><div class="panel tablewrap"><table><thead><tr><th>Event ID</th><th>Event</th><th>School</th><th>Department</th><th>Program</th><th>QR</th><th>Manual</th><th>Total</th><th>Status</th><th>IRP Action</th></tr></thead><tbody id="irows"></tbody></table></div><div id="irpEdit"></div></section>
+
+<section id="irpLogin" class="hide">
+  <div style="max-width:520px;margin:45px auto">
+    <div class="panel">
+      <div class="center">
+        <h1>IRP Department Login</h1>
+        <p class="form-intro">Authorized IRP users only.</p>
+      </div>
+      <form id="irpLoginForm">
+        <label>Username / Email*
+          <input id="irpUser" type="text" autocomplete="username" required placeholder="Enter IRP username">
+        </label>
+        <label>Password*
+          <input id="irpPass" type="password" autocomplete="current-password" required placeholder="Enter password">
+        </label>
+        <div id="loginError" class="notice hide" style="margin:14px 0">Invalid username or password.</div>
+        <button class="primary" style="width:100%">Login to IRP Portal</button>
+      </form>
+      <p class="field-help center" style="margin-top:15px">Demo credentials: <b>irp@cud.ac.ae</b> / <b>IRP123!</b></p>
+      <button class="secondary" style="width:100%;margin-top:8px" onclick="home()">← Back to Event Organizer</button>
+    </div>
+  </div>
+</section>
+<section id="irp" class="hide"><div class="toplinks"><button class="active">IRP Dashboard</button><button onclick="exportCSV()">Export CSV</button><button onclick="irpLogout()">Logout</button></div><h1>IRP Department Portal</h1><div class="irpgrid"><div class="irpbox"><strong id="ievents">0</strong>Total Events</div><div class="irpbox"><strong id="iqr">0</strong>QR Attendance</div><div class="irpbox"><strong id="imanual">0</strong>Manual Attendance</div><div class="irpbox"><strong id="itotal">0</strong>Total Attendance</div></div><div class="panel filtergrid"><select id="fschool"><option value="">All Schools</option><option>CUD</option><option>SEAST</option><option>SAID</option><option>SOM</option><option>SCCI</option><option>SHSP</option></select><input id="fdept" placeholder="Department"><input id="fprogram" placeholder="Program"><select id="fstatus"><option value="">All Statuses</option><option>Pre-Event Submitted</option><option>Post-Event Submitted & Locked</option></select><button class="primary" onclick="renderIRP()">Apply</button></div><div class="panel tablewrap"><table><thead><tr><th>Event ID</th><th>Event</th><th>School</th><th>Department</th><th>Program</th><th>QR</th><th>Manual</th><th>Total</th><th>Status</th><th>IRP Action</th></tr></thead><tbody id="irows"></tbody></table></div><div id="irpEdit"></div></section>
 </main><div id="toast"></div>
 <script>
 const EK="cud_v10_events",AK="cud_v10_att";let current=null;
 function seed(){if(localStorage.getItem(EK))return;localStorage.setItem(EK,JSON.stringify([{id:1,event_id:"CUD-EVT-2026-0001",creator_email:"demo@cud.ac.ae",department:"Computer Engineering",school:"SEAST",event_name:"AI Research Symposium",program_name:"BSc Computer Science",programs:"All Programs-SEAST",main_category:"AE - Academic Event",qr:12,manual:5,status:"Post-Event Submitted & Locked",evidence:["event-photo-1.jpg"],remarks:"Successful event."}]))}
 function es(){return JSON.parse(localStorage.getItem(EK)||"[]")}function save(a){localStorage.setItem(EK,JSON.stringify(a))}
 function sections(){return [...document.querySelectorAll("main>section")]}function show(id){sections().forEach(x=>x.classList.add("hide"));document.getElementById(id).classList.remove("hide");scrollTo(0,0)}
-function home(){show("home")}function createPage(){show("create")}function findPage(){show("find");found.innerHTML=""}function irp(){show("irp");renderIRP()}
+function home(){show("home")}
+function createPage(){show("create")}
+function findPage(){show("find");found.innerHTML=""}
+function irpLoginPage(){
+  if(sessionStorage.getItem("cud_irp_demo_auth")==="1"){irp();return;}
+  show("irpLogin");document.getElementById("irpUser").focus();
+}
+function irp(){if(sessionStorage.getItem("cud_irp_demo_auth")!=="1"){irpLoginPage();return;}show("irp");renderIRP()}
+function irpLogout(){sessionStorage.removeItem("cud_irp_demo_auth");show("irpLogin");document.getElementById("irpPass").value="";}
+
 function toast(t){let x=document.getElementById("toast");x.textContent=t;x.style.display="block";setTimeout(()=>x.style.display="none",1800)}
 eventForm.onsubmit=e=>{e.preventDefault();let f=new FormData(eventForm),a=es(),obj={id:Date.now(),event_id:"CUD-EVT-2026-"+String(a.length+1).padStart(4,"0"),qr:0,manual:0,status:"Pre-Event Submitted",evidence:[],remarks:""};for(let[k,v]of f)obj[k]=v;obj.creator_email=obj.creator_email.toLowerCase();a.push(obj);save(a);current=obj.id;createdName.textContent=obj.event_name;createdId.textContent=obj.event_id;show("created");makeQR()}
 function attendanceURL(){
@@ -98,6 +130,18 @@ function filtered(){let a=es(),s=fschool.value,d=fdept.value.toLowerCase(),p=fpr
 function renderIRP(){let a=filtered();ievents.textContent=a.length;iqr.textContent=a.reduce((s,e)=>s+(e.qr||0),0);imanual.textContent=a.reduce((s,e)=>s+(e.manual||0),0);itotal.textContent=a.reduce((s,e)=>s+(e.qr||0)+(e.manual||0),0);irows.innerHTML=a.map(e=>`<tr><td>${e.event_id}</td><td>${e.event_name}</td><td>${e.school}</td><td>${e.department}</td><td>${e.program_name||e.programs||""}</td><td>${e.qr||0}</td><td>${e.manual||0}</td><td><b>${(e.qr||0)+(e.manual||0)}</b></td><td>${e.status}</td><td><button onclick="editIRP(${e.id})">Edit</button></td></tr>`).join("")}
 function editIRP(id){let e=es().find(x=>x.id==id);irpEdit.innerHTML=`<div class="panel"><h2>IRP Edit / Correction</h2><div class="notice">Only IRP can modify a locked post-event record.</div><form id="ifm" class="grid"><label>Event Name<input id="ien" value="${e.event_name}"></label><label>Manual Attendance<input id="ima" type="number" min="0" value="${e.manual||0}"></label><label>Status<select id="ist"><option ${e.status==="Pre-Event Submitted"?"selected":""}>Pre-Event Submitted</option><option ${e.status==="Post-Event Submitted & Locked"?"selected":""}>Post-Event Submitted & Locked</option></select></label><label class="wide">Remarks<textarea id="irm">${e.remarks||""}</textarea></label><button class="primary wide">Save IRP Correction</button></form></div>`;document.getElementById("ifm").onsubmit=x=>{x.preventDefault();let a=es(),v=a.find(z=>z.id==id);v.event_name=ien.value;v.manual=+ima.value||0;v.status=ist.value;v.remarks=irm.value;save(a);renderIRP();irpEdit.innerHTML="";toast("IRP correction saved")}}
 function exportCSV(){let a=filtered(),cols=["event_id","event_name","school","department","program_name","main_category","qr","manual","status"],r=[cols.join(",")];a.forEach(e=>r.push(cols.map(k=>`"${String(e[k]??"").replaceAll('"','""')}"`).join(",")));let b=new Blob([r.join("\\n")],{type:"text/csv"}),u=URL.createObjectURL(b),x=document.createElement("a");x.href=u;x.download="CUD_CHEDS_Events.csv";x.click()}
+document.getElementById("irpLoginForm").onsubmit=function(e){
+ e.preventDefault();
+ const u=document.getElementById("irpUser").value.trim().toLowerCase();
+ const pw=document.getElementById("irpPass").value;
+ if(u==="irp@cud.ac.ae" && pw==="IRP123!"){
+   sessionStorage.setItem("cud_irp_demo_auth","1");
+   document.getElementById("loginError").classList.add("hide");
+   irp();
+ }else{
+   document.getElementById("loginError").classList.remove("hide");
+ }
+};
 seed();
 let qp=new URLSearchParams(location.search);
 if(qp.get("attendance")){
