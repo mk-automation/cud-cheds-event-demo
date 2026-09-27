@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CUD CHEDS Event Demo</title><link rel="stylesheet" href="style.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script></head><body>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CUD CHEDS Event Demo</title><link rel="stylesheet" href="style.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script></head><body>
 <header><div><b>CANADIAN UNIVERSITY DUBAI</b><small>CHEDS Event Management System</small></div><span>Interactive Demo</span></header>
 <nav><button onclick="home()">Event Organizer</button><button onclick="irpLoginPage()">IRP Department</button></nav><main>
 <section id="home"><h1>Event Organizer</h1><p class="form-intro">Use this shared link to create an event, generate/download its attendance QR, or return later to submit post-event information.</p><div class="homecards">
@@ -13,9 +13,9 @@
 <label>Department*<input name="department" required></label><label>School*<select name="school"><option>CUD</option><option>SEAST</option><option>SAID</option><option>SOM</option><option>SCCI</option><option>SHSP</option></select></label>
 <label>Event Name*<span class="field-help">Enter the official event name in English. Arabic will be generated automatically.</span><input name="event_name" id="eventNameEnglish" required autocomplete="off"></label><label>Event Name Arabic*<span class="field-help" id="arabicNameStatus">Automatically translated from English. Please review before submission.</span><input name="event_name_ar" id="eventNameArabic" dir="rtl" lang="ar" required></label>
 <label class="wide">Event Description*<span class="field-help">Enter a brief description in English (maximum 255 characters). Arabic will be generated automatically.</span><textarea name="event_description" id="eventDescriptionEnglish" maxlength="255" required></textarea></label><label class="wide">Event Description Arabic*<span class="field-help" id="arabicDescriptionStatus">Automatically translated from English. Please review before submission.</span><textarea name="event_description_ar" id="eventDescriptionArabic" maxlength="255" dir="rtl" lang="ar" required></textarea></label>
-<label>Event Main Category*<select name="main_category"><option>AE - Academic Event</option><option>CE - Community Event</option></select></label><label>Event SubCategory*<select name="sub_category"><option>AC-Academic</option><option>RI-Research and Innovation</option><option>CE-Community Engagement and Outreach</option><option>PD-Professional Development</option><option>IN-Industry and Career Connections</option><option>HW-Health and Wellness</option></select></label>
+<label>Website<input name="website" type="url" placeholder="https://"></label><label>Event Main Category*<select name="main_category"><option>AE - Academic Event</option><option>CE - Community Event</option></select></label><label>Event SubCategory*<select name="sub_category"><option>AC-Academic</option><option>RI-Research and Innovation</option><option>CE-Community Engagement and Outreach</option><option>PD-Professional Development</option><option>IN-Industry and Career Connections</option><option>HW-Health and Wellness</option></select></label>
 <label>Event Type*<select name="event_type"><option>CN-Conference</option><option>WS-Workshop</option><option>SM-Seminar</option><option>SYM-Symposium</option><option>LC-Lecture Series</option><option>CM-Competition</option></select></label><label>HEI Role*<select name="hei_role"><option>OE-Organizing an Event</option><option>HS-Hosting an Event</option><option>EP-Event Partner</option><option>SP-Event Sponsor</option></select></label>
-<label>Programs*<select name="programs"><option>All Programs-CUD</option><option>All Programs-SEAST</option><option>All Programs-SAID</option><option>All Programs-SOM</option><option>All Programs-SCCI</option><option>All Programs-SHSP</option></select></label><label>Program Name<input name="program_name"></label>
+<label>Industry<input name="industry" placeholder="CHEDS industry code / sector"></label><label>Programs*<select name="programs"><option>All Programs-CUD</option><option>All Programs-SEAST</option><option>All Programs-SAID</option><option>All Programs-SOM</option><option>All Programs-SCCI</option><option>All Programs-SHSP</option></select></label><label>Program Name<input name="program_name"></label>
 <label>Venue*<input name="venue" required></label><label>City*<input name="city" value="Dubai" required></label><label>Country*<input name="country" value="United Arab Emirates" required></label>
 <label>Start Date*<input name="start_date" type="date" required></label><label>End Date*<input name="end_date" type="date" required></label><label>Duration Hours*<input name="duration_hours" type="number" step=".25" required></label>
 <label>Frequency*<select name="frequency"><option>One-time</option><option>Recurring</option></select></label><label>Audience Type*<select name="audience_type"><option>Internal Events</option><option>External Events</option><option>For Both</option></select></label>
@@ -53,7 +53,7 @@
     </div>
   </div>
 </section>
-<section id="irp" class="hide"><div class="toplinks"><button class="active">IRP Dashboard</button><button onclick="exportCSV()">Export CSV</button><button onclick="irpLogout()">Logout</button></div><h1>IRP Department Portal</h1><div class="irpgrid"><div class="irpbox"><strong id="ievents">0</strong>Total Events</div><div class="irpbox"><strong id="iqr">0</strong>QR Attendance</div><div class="irpbox"><strong id="imanual">0</strong>Manual Attendance</div><div class="irpbox"><strong id="itotal">0</strong>Total Attendance</div></div><div class="panel filtergrid"><select id="fschool"><option value="">All Schools</option><option>CUD</option><option>SEAST</option><option>SAID</option><option>SOM</option><option>SCCI</option><option>SHSP</option></select><input id="fdept" placeholder="Department"><input id="fprogram" placeholder="Program"><select id="fstatus"><option value="">All Statuses</option><option>Pre-Event Submitted</option><option>Post-Event Submitted & Locked</option></select><button class="primary" onclick="renderIRP()">Apply</button></div><div class="panel tablewrap"><table><thead><tr><th>Event ID</th><th>Event</th><th>School</th><th>Department</th><th>Program</th><th>QR</th><th>Manual</th><th>Total</th><th>Status</th><th>IRP Action</th></tr></thead><tbody id="irows"></tbody></table></div><div id="irpEdit"></div></section>
+<section id="irp" class="hide"><div class="toplinks"><button class="active">IRP Dashboard</button><button onclick="exportCHEDSExcel()">Download CHEDS Excel</button><button onclick="irpLogout()">Logout</button></div><h1>IRP Department Portal</h1><div class="irpgrid"><div class="irpbox"><strong id="ievents">0</strong>Total Events</div><div class="irpbox"><strong id="iqr">0</strong>QR Attendance</div><div class="irpbox"><strong id="imanual">0</strong>Manual Attendance</div><div class="irpbox"><strong id="itotal">0</strong>Total Attendance</div></div><div class="panel filtergrid"><select id="fschool"><option value="">All Schools</option><option>CUD</option><option>SEAST</option><option>SAID</option><option>SOM</option><option>SCCI</option><option>SHSP</option></select><input id="fdept" placeholder="Department"><input id="fprogram" placeholder="Program"><select id="fstatus"><option value="">All Statuses</option><option>Pre-Event Submitted</option><option>Post-Event Submitted & Locked</option></select><button class="primary" onclick="renderIRP()">Apply</button></div><div class="panel tablewrap"><table><thead><tr><th>Event ID</th><th>Event</th><th>School</th><th>Department</th><th>Program</th><th>QR</th><th>Manual</th><th>Total</th><th>Status</th><th>IRP Action</th></tr></thead><tbody id="irows"></tbody></table></div><div id="irpEdit"></div></section>
 </main><div id="toast"></div>
 <script>
 const EK="cud_v10_events",AK="cud_v10_att";let current=null;
@@ -129,6 +129,85 @@ function postForm(id){let e=es().find(x=>x.id==id);if(e.status==="Post-Event Sub
 function filtered(){let a=es(),s=fschool.value,d=fdept.value.toLowerCase(),p=fprogram.value.toLowerCase(),st=fstatus.value;return a.filter(e=>(!s||e.school===s)&&(!d||(e.department||"").toLowerCase().includes(d))&&(!p||(e.program_name||e.programs||"").toLowerCase().includes(p))&&(!st||e.status===st))}
 function renderIRP(){let a=filtered();ievents.textContent=a.length;iqr.textContent=a.reduce((s,e)=>s+(e.qr||0),0);imanual.textContent=a.reduce((s,e)=>s+(e.manual||0),0);itotal.textContent=a.reduce((s,e)=>s+(e.qr||0)+(e.manual||0),0);irows.innerHTML=a.map(e=>`<tr><td>${e.event_id}</td><td>${e.event_name}</td><td>${e.school}</td><td>${e.department}</td><td>${e.program_name||e.programs||""}</td><td>${e.qr||0}</td><td>${e.manual||0}</td><td><b>${(e.qr||0)+(e.manual||0)}</b></td><td><span class="status ${e.status==="Post-Event Submitted & Locked"?"status-post":"status-pre"}">${e.status}</span></td><td><button onclick="editIRP(${e.id})">Edit</button></td></tr>`).join("")}
 function editIRP(id){let e=es().find(x=>x.id==id);irpEdit.innerHTML=`<div class="panel"><h2>IRP Edit / Correction</h2><div class="notice">Only IRP can modify a locked post-event record.</div><form id="ifm" class="grid"><label>Event Name<input id="ien" value="${e.event_name}"></label><label>Manual Attendance<input id="ima" type="number" min="0" value="${e.manual||0}"></label><label>Status<select id="ist"><option ${e.status==="Pre-Event Submitted"?"selected":""}>Pre-Event Submitted</option><option ${e.status==="Post-Event Submitted & Locked"?"selected":""}>Post-Event Submitted & Locked</option></select></label><label class="wide">Remarks<textarea id="irm">${e.remarks||""}</textarea></label><button class="primary wide">Save IRP Correction</button></form></div>`;document.getElementById("ifm").onsubmit=x=>{x.preventDefault();let a=es(),v=a.find(z=>z.id==id);v.event_name=ien.value;v.manual=+ima.value||0;v.status=ist.value;v.remarks=irm.value;save(a);renderIRP();irpEdit.innerHTML="";toast("IRP correction saved")}}
+
+function exportCHEDSExcel(){
+ if(typeof XLSX==="undefined"){alert("Excel export library did not load. Please check your internet connection and try again.");return;}
+ const rows=filtered();
+ const headers=[
+  "Events_InstCode","Events_InstName","Event_ID","Event_Year","Event_Department","Event_College ",
+  "Event_Name ","Event_NameAR","Event_Desc","Event_DescAR","Event_Website","Event_Main_Category",
+  "Event_Category","Event_Type ","HEI_Role","Event_Industry","Event_Specialization ","Event_Venue",
+  "Event_City","Event_Country","Event_Start_Date","Event_End_Date","Event_Hours ","Event_Frequency ",
+  "Event_Audience ","Audience_Type","Event_Attendees ","Event_Scope ","Event_student_ind","Remarks"
+ ];
+ const codeOnly=v=>{
+   v=String(v??"").trim();
+   if(!v)return "";
+   let m=v.match(/^([A-Za-z0-9]+)(?:\s*-\s*|$)/);
+   return m?m[1]:v;
+ };
+ const yearOf=e=>{
+   let d=e.start_date?new Date(e.start_date+"T00:00:00"):null;
+   return d && !isNaN(d)?d.getFullYear():new Date().getFullYear();
+ };
+ const excelDate=v=>{
+   if(!v)return "";
+   let d=new Date(v+"T00:00:00");
+   return isNaN(d)?"":d;
+ };
+ const data=rows.map(e=>[
+   19,
+   "Canadian University Dubai",
+   e.event_id||"",
+   yearOf(e),
+   e.department||"",
+   e.school||"",
+   e.event_name||"",
+   e.event_name_ar||"",
+   e.event_description||"",
+   e.event_description_ar||"",
+   e.website||"",
+   codeOnly(e.main_category),
+   codeOnly(e.sub_category),
+   codeOnly(e.event_type),
+   codeOnly(e.hei_role),
+   e.industry||"",
+   e.program_name||e.programs||"",
+   e.venue||"",
+   e.city||"",
+   e.country||"",
+   excelDate(e.start_date),
+   excelDate(e.end_date),
+   e.duration_hours||"",
+   codeOnly(e.frequency),
+   codeOnly(e.audience_type),
+   codeOnly(e.targeted_audience),
+   (Number(e.qr)||0)+(Number(e.manual)||0),
+   codeOnly(e.scope),
+   String(e.open_to_students||"").toLowerCase()==="yes"?"Y":(String(e.open_to_students||"").toLowerCase()==="no"?"N":e.open_to_students||""),
+   e.remarks||""
+ ]);
+ const ws=XLSX.utils.aoa_to_sheet([headers,...data]);
+ ws["!cols"]=[
+  {wch:15},{wch:24},{wch:18},{wch:11},{wch:35},{wch:28},{wch:45},{wch:38},{wch:55},{wch:55},
+  {wch:28},{wch:20},{wch:20},{wch:16},{wch:16},{wch:24},{wch:32},{wch:35},{wch:16},{wch:18},
+  {wch:16},{wch:16},{wch:14},{wch:18},{wch:18},{wch:28},{wch:18},{wch:16},{wch:18},{wch:38}
+ ];
+ ws["!autofilter"]={ref:"A1:AD"+(data.length+1)};
+ for(let c=0;c<headers.length;c++){
+   let cell=ws[XLSX.utils.encode_cell({r:0,c})];
+   if(cell) cell.s={font:{bold:true},alignment:{vertical:"center",wrapText:true}};
+ }
+ for(let r=1;r<=data.length;r++){
+   for(let c of [20,21]){
+     let cell=ws[XLSX.utils.encode_cell({r,c})];
+     if(cell && cell.v instanceof Date){cell.t="d";cell.z="dd/mm/yyyy";}
+   }
+ }
+ const wb=XLSX.utils.book_new();
+ XLSX.utils.book_append_sheet(wb,ws,"Events");
+ XLSX.writeFile(wb,"Institute-Events-CHEDS.xlsx");
+}
 function exportCSV(){let a=filtered(),cols=["event_id","event_name","school","department","program_name","main_category","qr","manual","status"],r=[cols.join(",")];a.forEach(e=>r.push(cols.map(k=>`"${String(e[k]??"").replaceAll('"','""')}"`).join(",")));let b=new Blob([r.join("\\n")],{type:"text/csv"}),u=URL.createObjectURL(b),x=document.createElement("a");x.href=u;x.download="CUD_CHEDS_Events.csv";x.click()}
 
 async function autoTranslate(sourceId,targetId,statusId,maxLen){
